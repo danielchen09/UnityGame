@@ -13,7 +13,8 @@ public class Murdue2 : MonoBehaviour, Enemy {
 	private string direction;
 	private float init;
 	private float updateTime;
-	public bool isAttacking;
+	private bool isAttacking;
+	private int damage;
 
 	private GameObject player;
 	private GameObject healthBar;
@@ -26,6 +27,7 @@ public class Murdue2 : MonoBehaviour, Enemy {
 		player = GameObject.Find ("Player");
 		velocity = 1;
 		health = 100;
+		damage = 10;
 		init = Time.time;
 		updateTime = Time.time;
 		direction = DIRECTIONS [Random.Range (0, 3)];
@@ -61,6 +63,7 @@ public class Murdue2 : MonoBehaviour, Enemy {
 		} else {
 			rb.velocity = Vector2.zero;
 			animator.SetTrigger ("death");
+
 		}
 	}
 
@@ -114,13 +117,21 @@ public class Murdue2 : MonoBehaviour, Enemy {
 	}
 
 	public void attack(){
-		Debug.Log ("DSAFASD");
 		float dist = Mathf.Sqrt (Mathf.Pow (transform.position.x - player.transform.position.x, 2) + Mathf.Pow (transform.position.y - player.transform.position.y, 2));
 		float cos = (player.transform.position.x - transform.position.x) / dist;
 		float sin = (player.transform.position.y - transform.position.y) / dist;
 		GameObject arrow;
 		arrow = Instantiate (Resources.Load<GameObject> ("arrow"), transform.position + new Vector3 (cos, sin, 0), Quaternion.Euler (0, 0, -45 + ((cos>=0)?Mathf.Atan(sin/cos):Mathf.Atan(sin/cos)+Mathf.PI) * 180/Mathf.PI));
 		arrow.GetComponent<Rigidbody2D> ().velocity = new Vector2 (2 * cos, 2 * sin);
+		arrow.GetComponent<Arrow> ().setOwner (gameObject);
+	}
+
+	public void OnBecameInvisible(){
+		velocity = 0;
+	}
+
+	public void OnBecameVisible(){
+		velocity = 1;	
 	}
 
 	public void attacking (bool b){
@@ -135,5 +146,11 @@ public class Murdue2 : MonoBehaviour, Enemy {
 	}
 	public GameObject getHealthBar(){
 		return healthBar;
+	}
+	public int getDamage(){
+		return damage;
+	}
+	public void setDamage(int damage){
+		this.damage = damage;
 	}
 }

@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Merida : MonoBehaviour, Player {
+public class Dad: MonoBehaviour, Player {
 
 	private Animator animator;
 	private Rigidbody2D rb;
@@ -17,19 +17,20 @@ public class Merida : MonoBehaviour, Player {
 
 	// Use this for initialization
 	void Start () {
-		name = "Merida";
+		name = "Dad";
 		animator = GetComponent<Animator> ();
 		rb = GetComponent<Rigidbody2D> ();
 		velocity = 1.0f;
 		health = 100;
 		energy = 0;
 		score = 0;
-		damage = 10;
+		damage = 30;
 	}
-	
+
 	// Update is called once per frame
 	void Update () {
 		if (health > 0) {
+			//movement animation
 			if (Input.GetKey (KeyCode.LeftArrow) && updateWalk) {
 				animator.ResetTrigger ("idle");
 				animator.SetTrigger ("walkLeft");
@@ -48,6 +49,7 @@ public class Merida : MonoBehaviour, Player {
 				updateWalk = false;
 			}
 
+			//movement
 			if (Input.GetKey (KeyCode.LeftArrow)) {
 				rb.velocity = new Vector2 (Input.GetAxis ("Horizontal"), 0) * velocity * 2;
 			} else if (Input.GetKey (KeyCode.RightArrow)) {
@@ -60,6 +62,7 @@ public class Merida : MonoBehaviour, Player {
 				rb.velocity = new Vector2 (Input.GetAxis ("Horizontal"), Input.GetAxis ("Vertical"));
 			}
 
+			//movement stop animation
 			if (Input.GetKeyUp (KeyCode.UpArrow)) {
 				animator.SetTrigger ("idle");
 				updateWalk = true;
@@ -74,21 +77,19 @@ public class Merida : MonoBehaviour, Player {
 				updateWalk = true;
 			}
 
+			//light attack
 			if (Input.GetKeyDown (KeyCode.Z)) {
-				animator.SetTrigger ("shoot");
+				animator.SetTrigger ("melee");
 				rb.velocity = Vector2.zero;
 			} 
 
-			if (Input.GetKeyDown (KeyCode.R) && energy >= 50) {
-				GameObject arrow;
-				for (int i = 0; i <= 20; i++) {
-					arrow = Instantiate (Resources.Load<GameObject> ("arrow"), transform.position + new Vector3 (Mathf.Cos (((360 * (float)i / 20)) * Mathf.PI / 180), Mathf.Sin (((360 * (float)i / 20)) * Mathf.PI / 180), 0), Quaternion.Euler (0, 0, (360 * (float)i / 20) - 45));
-					arrow.GetComponent<Rigidbody2D> ().velocity = new Vector2 (2 * Mathf.Cos ((arrow.transform.eulerAngles.z + 45) * Mathf.PI / 180), 2 * Mathf.Sin ((arrow.transform.eulerAngles.z + 45) * Mathf.PI / 180));;
-					arrow.GetComponent<Arrow> ().setOwner (gameObject);
-				}
-				energy -= 50;
+			//ultimate
+			if (Input.GetKeyDown (KeyCode.R)) {
+				incrementHealth (energy);
+				energy = 0;
 			}
 		} else {
+			//death
 			velocity = 0;
 			foreach (GameObject g in Object.FindObjectsOfType<GameObject>()) {
 				if (g.name.IndexOf ("Enemy") != -1)
@@ -101,7 +102,6 @@ public class Merida : MonoBehaviour, Player {
 		GameObject arrow;
 		arrow = Instantiate (Resources.Load<GameObject> ("arrow"), transform.position + new Vector3(x, y, 0), Quaternion.Euler (0, 0, -45 + Mathf.Acos(x) * 180/Mathf.PI));
 		arrow.GetComponent<Rigidbody2D> ().velocity = new Vector2 (20 * x, 20 * y);
-		arrow.GetComponent<Arrow> ().setOwner (gameObject);
 	}
 
 	public string getName(){
@@ -118,6 +118,9 @@ public class Merida : MonoBehaviour, Player {
 	}
 	public void setHealth(int health){
 		this.health = Mathf.Max(health, 0);
+	}
+	public void incrementHealth(int health){
+		this.health += (this.health + health > 100) ? 0 : health;
 	}
 	public int getEnergy(){
 		return energy;

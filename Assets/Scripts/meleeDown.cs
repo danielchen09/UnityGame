@@ -16,7 +16,12 @@ public class meleeDown : StateMachineBehaviour {
 	override public void OnStateUpdate(Animator animator, AnimatorStateInfo stateInfo, int layerIndex) {
 		if (stateInfo.normalizedTime >= 0.5 && !hit) {
 			hitBox = Instantiate (Resources.Load<GameObject> ("meleeHitbox"), animator.gameObject.transform.position + new Vector3(0, -0.5f, 0), Quaternion.identity);
+			hitBox.GetComponent<meleeHitBox> ().setOwner (animator.gameObject);
 			hit = true;
+			if (Input.GetKey (KeyCode.DownArrow) && animator.gameObject.name.IndexOf("Player") != -1) {
+				animator.ResetTrigger ("idle");
+				animator.SetTrigger ("walkDown");
+			}
 		}
 	}
 

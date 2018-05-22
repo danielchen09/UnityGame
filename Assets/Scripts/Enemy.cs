@@ -8,4 +8,6 @@ public interface Enemy{
 	GameObject getHealthBar ();
 	void attack();
 	void attacking(bool b);
+	int getDamage ();
+	void setDamage(int damage);
 }
